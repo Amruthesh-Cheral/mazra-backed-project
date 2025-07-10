@@ -157,3 +157,27 @@ export const toggleWishlist = catchAsync(async (req, res, next) => {
     });
   }
 });
+
+
+
+export const getUserWishlistByAdmin = catchAsync(async (req, res, next) => {
+  const { userId } = req.params;
+
+  const wishlist = await Wishlist.findOne({ user: userId }).populate({
+    path: 'products',
+    select: 'name price discountedPrice slug category images',
+  });
+
+  if (!wishlist || wishlist.products.length === 0) {
+    return res.status(200).json({
+      success: true,
+      message: 'Wishlist is empty',
+      data: [],
+    });
+  }
+
+  res.status(200).json({
+    success: true,
+    data: wishlist,
+  });
+});

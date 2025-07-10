@@ -60,6 +60,10 @@ export const signin = catchAsync(async (req, res, next) => {
   if (!user) {
     return next(new ApiError(401, 'Invalid credentials'));
   }
+
+  if (user.isBlocked) {
+    return next(new ApiError(403, 'Your account has been blocked. Please contact support.'));
+  }
   
   // Check if email is verified
   if (!user.verifyStatus) {
@@ -145,21 +149,6 @@ export const google = catchAsync(async (req, res, next) => {
   });
 });
 
-
-
-export const getUsers=async(req,res)=>{
-    try {
-        const userdata=await User.find();
-
-        console.log(userdata);
-        
-
-        res.status(200).json({msg:"Success",userdata})
-
-    } catch (error) {
-        res.status(500).json({msg:error.message})
-    }
-}
 
 
 

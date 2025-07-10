@@ -7,6 +7,7 @@ const userSchema = new mongoose.Schema({
   password: { type: String, required: true },
   role: { type: String, enum: ['User', 'Admin'], default: 'User' },
   verifyStatus: { type: Boolean, default: false },
+  isBlocked: { type: Boolean, default: false },
   avatar: { type: String, default: '../public/avatar.jpg' },
   provider: { type: String, enum: ['normal', 'google'], default: 'normal' }
 }, { timestamps: true });

@@ -183,3 +183,27 @@ export const clearCart = catchAsync(async (req, res, next) => {
     data: cart,
   });
 });
+
+
+
+export const getUserCartByAdmin = catchAsync(async (req, res, next) => {
+  const { userId } = req.params;
+
+  const cart = await Cart.findOne({ user: userId }).populate({
+    path: 'items.product',
+    select: 'name price discountedPrice stock slug category images',
+  });
+
+  if (!cart || cart.items.length === 0) {
+    return res.status(200).json({
+      success: true,
+      message: 'Cart is empty',
+      data: [],
+    });
+  }
+
+  res.status(200).json({
+    success: true,
+    data: cart,
+  });
+});
