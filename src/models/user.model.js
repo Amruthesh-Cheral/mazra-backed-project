@@ -8,7 +8,10 @@ const userSchema = new mongoose.Schema({
   role: { type: String, enum: ['User', 'Admin'], default: 'User' },
   verifyStatus: { type: Boolean, default: false },
   isBlocked: { type: Boolean, default: false },
-  avatar: { type: String, default: '../public/avatar.jpg' },
+  avatar: {
+  url: { type: String, required: true, default: '../public/avatar.jpg' },
+  public_id: { type: String }
+},
   provider: { type: String, enum: ['normal', 'google'], default: 'normal' }
 }, { timestamps: true });
 

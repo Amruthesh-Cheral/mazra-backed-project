@@ -85,3 +85,63 @@ export const deleteUser = catchAsync(async (req, res, next) => {
     message: 'User deleted successfully',
   });
 });
+
+
+export const getUserProfile = catchAsync(async (req, res, next) => {
+  const user = await User.findById(req.user._id).select('-password');
+  if (!user) return next(new ApiError(404, 'User not found'));
+
+  res.status(200).json({
+    success: true,
+    data: user,
+  });
+})
+
+export const updateUserProfile = catchAsync(async (req, res, next) => {
+  const userId=req.user._id;
+  const {username,oldPassword,newPassword} = req.body;
+  const user = await User.findById(userId);
+  if (!user) return next(new ApiError(404, 'User not found'));
+
+  if (username) user.username = username;
+  if (oldPassword && newPassword) {
+    const isMatch = await user.comparePassword(oldPassword);
+    if (!isMatch) return next(new ApiError(400, 'Old password is incorrect'));
+    if(oldPassword === newPassword) return next(new ApiError(400, 'New password cannot be the same as old password'));
+    user.password = newPassword;
+  }
+
+  // Upload avatar if provided
+  if (req.file) {
+    // Delete old avatar from cloudinary if exists
+    if (user.avatar.public_id) {
+      await cloudinary.uploader.destroy(user.avatar.public_id);
+    }
+
+    const result = await cloudinary.uploader.upload(req.file.path, {
+      folder: 'mazracare/avatars',
+    });
+
+    user.avatar = {
+      url: result.secure_url,
+      public_id: result.public_id,
+    };
+
+    // Delete temp file
+    await fs.unlink(req.file.path);
+  }
+
+  await user.save();
+
+  res.status(200).json({
+    success: true,
+    message: 'Profile updated successfully',
+    data: {
+      username: user.username,
+      email: user.email,
+      avatar: user.avatar,
+      role: user.role,
+    },
+  });
+
+})
