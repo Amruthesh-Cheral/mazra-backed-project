@@ -1,6 +1,6 @@
 import express from "express";
-import { verifyToken } from "../middlewares/auth.middleware";
-import { authorizeRoles } from "../middlewares/role.middleware";
+import { verifyToken } from "../middlewares/auth.middleware.js";
+import { authorizeRoles } from "../middlewares/role.middleware.js";
 import {
   deleteUser,
   getAllUsers,
@@ -8,8 +8,8 @@ import {
   getUsersByVerification,
   toggleBlockUser,
   updateUserProfile,
-} from "../controllers/user.controller";
-import upload from "../middlewares/multer.middleware";
+} from "../controllers/user.controller.js";
+import upload from "../middlewares/multer.middleware.js";
 
 const userRouter = express.Router();
 
@@ -36,3 +36,6 @@ userRouter.put(
   upload.single('avatar'),
   updateUserProfile
 );
+
+
+export default userRouter;

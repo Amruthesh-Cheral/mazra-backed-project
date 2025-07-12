@@ -10,6 +10,7 @@ import passRouter from './routes/password.router.js';
 import productRouter from './routes/product.router.js';
 import cookieParser from 'cookie-parser';
 import cartRouter from './routes/cart.router.js';
+import userRouter from './routes/user.router.js';
 
 dotenv.config();
 const app=express();
@@ -23,6 +24,7 @@ app.use(limiter);
 
 // Routes
 app.use('/api/auth', authRouter);
+app.use('/api/user', userRouter);
 app.use('/api/password', passRouter);
 app.use('/api/products', productRouter);
 app.use('/api/cart', cartRouter);

@@ -1,8 +1,9 @@
-import { sendPasswordResetEmail } from "../config/email.js";
+import { sendEmail } from "../config/email.js";
 import catchAsync from "../middlewares/catchAsync.js";
 import User from "../models/user.model.js";
 import ApiError from "../utils/ApiError.js";
 import { comparePasswords} from "../utils/auth.js";
+import { resetPasswordOtpTemplate } from "../utils/templates.js";
 import { createOTPRecord, verifyOTP } from "./otp.controller.js";
 
 // Request password reset
@@ -24,7 +25,8 @@ export const forgotPassword = catchAsync(async (req, res, next) => {
 
   // Generate and send OTP
   const otp = await createOTPRecord(email, 'password-reset');
-  await sendPasswordResetEmail(email, otp);
+  const resetPasswordOtpTemp= resetPasswordOtpTemplate(user.username, otp)
+  await sendEmail(email,'Password Reset OTP', resetPasswordOtpTemp);
 
   res.status(200).json({
     success: true,

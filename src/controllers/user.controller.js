@@ -1,11 +1,16 @@
-import catchAsync from "../middlewares/catchAsync";
-import User from "../models/user.model";
-import ApiError from "../utils/ApiError";
+import cloudinary from "../config/cloudinary.js";
+import catchAsync from "../middlewares/catchAsync.js";
+import User from "../models/user.model.js";
+import ApiError from "../utils/ApiError.js";
+import { comparePasswords } from "../utils/auth.js";
+import fs from 'fs/promises';
+
 
 export const getAllUsers = catchAsync(async (req, res, next) => {
   const { search = '', page = 1, limit = 10 } = req.query;
 
   const query = {
+    role: { $ne: 'Admin' },
     $or: [
       { username: { $regex: search, $options: 'i' } },
       { email: { $regex: search, $options: 'i' } },
@@ -38,6 +43,8 @@ export const getUsersByVerification = catchAsync(async (req, res, next) => {
   }
 
   const isVerified = status === 'verified';
+  console.log("isVerified",isVerified);
+  
   const query = { verifyStatus: isVerified };
   const skip = (page - 1) * limit;
 
@@ -105,7 +112,7 @@ export const updateUserProfile = catchAsync(async (req, res, next) => {
 
   if (username) user.username = username;
   if (oldPassword && newPassword) {
-    const isMatch = await user.comparePassword(oldPassword);
+    const isMatch = await comparePasswords(oldPassword,user.password);
     if (!isMatch) return next(new ApiError(400, 'Old password is incorrect'));
     if(oldPassword === newPassword) return next(new ApiError(400, 'New password cannot be the same as old password'));
     user.password = newPassword;

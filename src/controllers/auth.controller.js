@@ -1,9 +1,9 @@
-import { sendVerificationEmail } from "../config/email.js";
+import { sendEmail } from "../config/email.js";
 import catchAsync from "../middlewares/catchAsync.js";
 import User from "../models/user.model.js";
 import ApiError from "../utils/ApiError.js";
 import { comparePasswords, generateToken } from "../utils/auth.js";
-// import { emailVerificationTemplate } from "../utils/templates.js";
+import { emailVerificationTemplate, resendOtpTemplate } from "../utils/templates.js";
 import { createOTPRecord, verifyOTP } from "./otp.controller.js";
 
 export const signup = catchAsync(async (req, res, next) => {
@@ -29,8 +29,8 @@ export const signup = catchAsync(async (req, res, next) => {
 
   // Generate and send OTP
   const otp = await createOTPRecord(email);
-  // const emailVerificationTemplate= emailVerificationTemplate(user.name, otp)
-  await sendVerificationEmail(email, otp);
+  const emailVerificationTemp= emailVerificationTemplate(user.username, otp)
+  await sendEmail(email,'Email Verification OTP', emailVerificationTemp);
 
   const userResponse = {
     _id: user._id,
@@ -212,7 +212,8 @@ export const resendVerificationEmail = catchAsync(async (req, res, next) => {
 
   // Generate new OTP
   const otp = await createOTPRecord(email);
-  await sendVerificationEmail(email, otp);
+  const resendOtpTemp= resendOtpTemplate(user.username, otp)
+  await sendEmail(email,'Resend Verification OTP', resendOtpTemp);
 
   res.status(200).json({
     success: true,
