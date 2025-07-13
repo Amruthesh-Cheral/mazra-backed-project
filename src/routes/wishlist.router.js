@@ -1,12 +1,13 @@
 import express from "express";
-import { verifyToken } from "../middlewares/auth.middleware";
+import { verifyToken } from "../middlewares/auth.middleware.js";
 import {
   addToWishlist,
   clearWishlist,
   getUserWishlistByAdmin,
   getWishlist,
   removeFromWishlist,
-} from "../controllers/wishlist.controller";
+} from "../controllers/wishlist.controller.js";
+import { authorizeRoles } from "../middlewares/role.middleware.js";
 
 const wishlistRouter = express.Router();
 
@@ -20,3 +21,6 @@ wishlistRouter.get(
 );
 wishlistRouter.delete("/:productId", verifyToken, removeFromWishlist);
 wishlistRouter.delete("/", verifyToken, clearWishlist);
+
+
+export default wishlistRouter;
