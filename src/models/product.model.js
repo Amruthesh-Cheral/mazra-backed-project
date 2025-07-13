@@ -31,11 +31,15 @@ const productSchema = new mongoose.Schema({
     type: Number,
     min: [0, 'Discounted price must be positive'],
   },
-  category: {
-    type: String,
-    required: [true, "Category is required"],
-    enum: ["Fruits", "Vegitables", "Plants", "Seeds", "Other"],
-  },
+  service: {
+  type: String,
+  required: [true, 'Service is required'],
+  enum: ['Institutional', 'Residential', 'Commercial', 'Industrial'],
+},
+category: {
+  type: String,
+  required: [true, 'Category is required'],
+},
   stock: {
     type: Number,
     required: true,

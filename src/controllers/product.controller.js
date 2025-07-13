@@ -5,21 +5,27 @@ import ApiError from '../utils/ApiError.js';
 import sharp from 'sharp';
 import fs from 'fs/promises';
 import slugify from 'slugify';
+import { serviceCategoryMap } from '../seeder/categoryData.js';
 
 export const createProduct = catchAsync(async (req, res, next) => {
   const {
     name,
     description,
     price,
+    service,
     discountPercent,
     category,
     stock,
     isFeatured,
   } = req.body;
 
-  if (!name || !description || !price || !category || !stock) {
+  if (!name || !description || !price || !service || !category || !stock) {
     return next(new ApiError(400, 'Missing required product fields'));
   }
+
+  if ( !serviceCategoryMap[service]?.includes(category)) {
+  return next(new ApiError(400, 'Invalid category for selected service'));
+}
 
   if (!req.files || req.files.length === 0) {
     return next(new ApiError(400, 'Product images are required'));
@@ -81,6 +87,7 @@ export const getAllProducts = catchAsync(async (req, res, next) => {
     limit = 10,
     keyword = '',
     category,
+    service,
     sort = '-createdAt',
   } = req.query;
 
@@ -91,9 +98,8 @@ export const getAllProducts = catchAsync(async (req, res, next) => {
     name: { $regex: keyword, $options: 'i' }, // letter-by-letter filter
   };
 
-  if (category) {
-    filter.category = category;
-  }
+  if (category) filter.category = category;
+  if (service) filter.service = service;
 
   const total = await Product.countDocuments(filter);
 
@@ -140,6 +146,7 @@ export const updateProduct = catchAsync(async (req, res, next) => {
     description,
     price,
     discountPercent,
+    service,
     category,
     stock,
     isFeatured,
@@ -181,6 +188,7 @@ export const updateProduct = catchAsync(async (req, res, next) => {
   product.description = description || product.description;
   product.price = price || product.price;
   product.discountPercent = discountPercent || product.discountPercent;
+  product.service = service || product.service;
   product.category = category || product.category;
   product.stock = stock || product.stock;
   product.isFeatured = isFeatured !== undefined ? isFeatured : product.isFeatured;
