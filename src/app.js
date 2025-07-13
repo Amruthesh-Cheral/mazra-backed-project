@@ -11,6 +11,8 @@ import productRouter from './routes/product.router.js';
 import cookieParser from 'cookie-parser';
 import cartRouter from './routes/cart.router.js';
 import userRouter from './routes/user.router.js';
+import orderRouter from './routes/order.router.js';
+import wishlistRouter from './routes/wishlist.router.js';
 
 dotenv.config();
 const app=express();
@@ -28,7 +30,8 @@ app.use('/api/user', userRouter);
 app.use('/api/password', passRouter);
 app.use('/api/products', productRouter);
 app.use('/api/cart', cartRouter);
-app.use('/api/wishlist', cartRouter);
+app.use('/api/wishlist', wishlistRouter);
+app.use('/api/order', orderRouter);
 
 // 404 Handler (if no route matches)
 app.use((req, res, next) => {
