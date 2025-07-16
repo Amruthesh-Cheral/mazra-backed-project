@@ -23,10 +23,6 @@ export const createProduct = catchAsync(async (req, res, next) => {
     return next(new ApiError(400, 'Missing required product fields'));
   }
 
-  if ( !serviceCategoryMap[service]?.includes(category)) {
-  return next(new ApiError(400, 'Invalid category for selected service'));
-}
-
   if (!req.files || req.files.length === 0) {
     return next(new ApiError(400, 'Product images are required'));
   }
@@ -66,6 +62,7 @@ export const createProduct = catchAsync(async (req, res, next) => {
     description,
     price,
     discountPercent,
+    service,
     category,
     stock,
     isFeatured,

@@ -13,6 +13,7 @@ import cartRouter from './routes/cart.router.js';
 import userRouter from './routes/user.router.js';
 import orderRouter from './routes/order.router.js';
 import wishlistRouter from './routes/wishlist.router.js';
+import serviceRouter from './routes/service.router.js';
 
 dotenv.config();
 const app=express();
@@ -32,6 +33,7 @@ app.use('/api/products', productRouter);
 app.use('/api/cart', cartRouter);
 app.use('/api/wishlist', wishlistRouter);
 app.use('/api/order', orderRouter);
+app.use('/api/service', serviceRouter);
 
 // 404 Handler (if no route matches)
 app.use((req, res, next) => {

@@ -7,6 +7,7 @@ if (!fs.existsSync(uploadPath)) {
   fs.mkdirSync(uploadPath);
 }
 
+// File storage logic
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, uploadPath);
@@ -17,17 +18,24 @@ const storage = multer.diskStorage({
   },
 });
 
+// Accept image and video mime types
 const fileFilter = (req, file, cb) => {
-  const allowedTypes = /jpeg|jpg|png|webp/;
-  const mimeType = allowedTypes.test(file.mimetype);
-  if (mimeType) cb(null, true);
-  else cb(new Error('Unsupported file type'), false);
+  const allowedImage = /jpeg|jpg|png|webp/;
+  const allowedVideo = /mp4|mov|avi|mkv|webm/;
+
+  const ext = path.extname(file.originalname).toLowerCase().slice(1);
+
+  if (allowedImage.test(ext) || allowedVideo.test(ext)) {
+    cb(null, true);
+  } else {
+    cb(new Error('Unsupported file type'), false);
+  }
 };
 
 const upload = multer({
   storage,
   fileFilter,
-  limits: { fileSize: 2 * 1024 * 1024 }, // 2MB max per file
+  limits: { fileSize: 20 * 1024 * 1024 }, // Max 20MB for both
 });
 
 export default upload;
