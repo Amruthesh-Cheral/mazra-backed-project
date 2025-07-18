@@ -1,6 +1,6 @@
 import express from 'express';
 import { verifyToken } from '../middlewares/auth.middleware.js';
-import { addCategory, addService, deleteCategory, deleteService, getAllServices, getCategoriesByService, updateCategory, updateService } from '../controllers/service.controller.js';
+import { addCategory, addService, deleteCategory, deleteService, getAllCategories, getAllServices, getCategoriesByService, updateCategory, updateService } from '../controllers/service.controller.js';
 import upload from '../middlewares/multer.middleware.js';
 import { authorizeRoles } from '../middlewares/role.middleware.js';
 
@@ -36,14 +36,17 @@ serviceRouter.post(
 serviceRouter.get(
   '/services',
   verifyToken,
-  authorizeRoles("Admin"),
   getAllServices
 );
 serviceRouter.get(
   '/categories/:serviceId',
   verifyToken,
-  authorizeRoles("Admin"),
   getCategoriesByService
+);
+serviceRouter.get(
+  '/categories',
+  verifyToken,
+  getAllCategories
 );
 
 
@@ -80,6 +83,9 @@ serviceRouter.delete(
   authorizeRoles("Admin"),
   deleteCategory
 );
+
+
+
 
 
 export default serviceRouter;

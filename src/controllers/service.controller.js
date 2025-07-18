@@ -84,17 +84,72 @@ export const addCategory = catchAsync(async (req, res, next) => {
 
 
 export const getAllServices = catchAsync(async (req, res, next) => {
-  const services = await Service.find().select({name:1}).sort({ name: 1 });
-  res.status(200).json({ success: true, data: services });
+  let { page = 1, limit = 10 } = req.query;
+  page = parseInt(page);
+  limit = parseInt(limit);
+
+  const total = await Service.countDocuments();
+
+  const services = await Service.find()
+    .sort({ name: 1 })
+    .skip((page - 1) * limit)
+    .limit(limit);
+
+  res.status(200).json({
+    success: true,
+    total,
+    page,
+    pages: Math.ceil(total / limit),
+    data: services,
+  });
 });
+
 
 
 export const getCategoriesByService = catchAsync(async (req, res, next) => {
   const { serviceId } = req.params;
+  let { page = 1, limit = 10 } = req.query;
+  page = parseInt(page);
+  limit = parseInt(limit);
 
-  const categories = await Category.find({ service: serviceId }).select({name:1}).sort({ name: 1 });
-  res.status(200).json({ success: true, data: categories });
+  const total = await Category.countDocuments({ service: serviceId });
+
+  const categories = await Category.find({ service: serviceId })
+    .sort({ name: 1 })
+    .skip((page - 1) * limit)
+    .limit(limit);
+
+  res.status(200).json({
+    success: true,
+    total,
+    page,
+    pages: Math.ceil(total / limit),
+    data: categories,
+  });
 });
+
+
+export const getAllCategories = catchAsync(async (req, res, next) => {
+  let { page = 1, limit = 10 } = req.query;
+  page = parseInt(page);
+  limit = parseInt(limit);
+
+  const total = await Category.countDocuments();
+
+  const categories = await Category.find()
+    .sort({ name: 1 })
+    .skip((page - 1) * limit)
+    .limit(limit);
+
+  res.status(200).json({
+    success: true,
+    total,
+    page,
+    pages: Math.ceil(total / limit),
+    data: categories,
+  });
+});
+
 
 
 

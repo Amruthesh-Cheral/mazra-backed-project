@@ -15,6 +15,7 @@ import orderRouter from './routes/order.router.js';
 import wishlistRouter from './routes/wishlist.router.js';
 import serviceRouter from './routes/service.router.js';
 import blogRouter from './routes/blog.router.js';
+import dashboardRouter from './routes/dashboard.route.js';
 
 dotenv.config();
 const app=express();
@@ -36,6 +37,7 @@ app.use('/api/wishlist', wishlistRouter);
 app.use('/api/order', orderRouter);
 app.use('/api/service', serviceRouter);
 app.use('/api/blog', blogRouter);
+app.use('/api/dashboard', dashboardRouter);
 
 // 404 Handler (if no route matches)
 app.use((req, res, next) => {
