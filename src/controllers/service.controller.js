@@ -3,6 +3,7 @@ import catchAsync from '../middlewares/catchAsync.js';
 import ApiError from '../utils/ApiError.js';
 import { uploadToCloudinary } from '../utils/cloudinary.upload.js';
 import Category from '../models/category.model.js';
+import cloudinary from '../config/cloudinary.js';
 
 export const addService = catchAsync(async (req, res, next) => {
   const { name, description } = req.body;
