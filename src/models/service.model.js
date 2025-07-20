@@ -3,6 +3,8 @@ import mongoose from 'mongoose';
 const serviceSchema = new mongoose.Schema({
   name: { type: String, required: true, unique: true },
   description: { type: String, required: true },
+  heading: { type: String},
+  subHeading: { type: String},
   image:{
   url: { type: String},
   public_id: { type: String }

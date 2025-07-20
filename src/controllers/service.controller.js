@@ -6,7 +6,7 @@ import Category from '../models/category.model.js';
 import cloudinary from '../config/cloudinary.js';
 
 export const addService = catchAsync(async (req, res, next) => {
-  const { name, description } = req.body;
+  const { name, description,heading,subHeading } = req.body;
 
   if (!name || !description) {
     return next(new ApiError(400, 'Name and description are required'));
@@ -28,6 +28,8 @@ export const addService = catchAsync(async (req, res, next) => {
   const service = await Service.create({
     name,
     description,
+    heading,
+    subHeading,
     image,
     video,
   });
@@ -156,13 +158,15 @@ export const getAllCategories = catchAsync(async (req, res, next) => {
 
 export const updateService = catchAsync(async (req, res, next) => {
   const { id } = req.params;
-  const { name, description } = req.body;
+  const { name, description,heading,subHeading } = req.body;
 
   const service = await Service.findById(id);
   if (!service) return next(new ApiError(404, 'Service not found'));
 
   if (name) service.name = name;
   if (description) service.description = description;
+  if (heading) service.heading = heading;
+  if (subHeading) service.subHeading = subHeading;
 
   if (req.files?.image) {
     // Delete old image
@@ -275,5 +279,35 @@ export const deleteCategory = catchAsync(async (req, res, next) => {
   res.status(200).json({
     success: true,
     message: 'Category deleted successfully',
+  });
+});
+
+
+
+
+export const getSingleService = catchAsync(async (req, res, next) => {
+  const { id } = req.params;
+
+  const service = await Service.findById(id);
+  if (!service) return next(new ApiError(404, 'Service not found'));
+
+  res.status(200).json({
+    success: true,
+    data: service,
+  });
+});
+
+
+
+
+export const getSingleCategory = catchAsync(async (req, res, next) => {
+  const { id } = req.params;
+
+  const category = await Category.findById(id).populate('service', 'name');
+  if (!category) return next(new ApiError(404, 'Category not found'));
+
+  res.status(200).json({
+    success: true,
+    data: category,
   });
 });
