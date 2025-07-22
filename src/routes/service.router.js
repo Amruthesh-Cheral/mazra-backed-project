@@ -15,9 +15,9 @@ serviceRouter.post(
   verifyToken,
   authorizeRoles("Admin"),
   upload.fields([
-    { name: 'image', maxCount: 1 },
-    { name: 'video', maxCount: 1 },
-  ]),
+  { name: 'image', maxCount: 5 },
+  { name: 'video', maxCount: 5 }
+]),
   addService
 );
 serviceRouter.post(
@@ -55,7 +55,10 @@ serviceRouter.put(
   '/service/:id',
   verifyToken,
   authorizeRoles("Admin"),
-  upload.fields([{ name: 'image', maxCount: 1 }, { name: 'video', maxCount: 1 }]),
+  upload.fields([
+  { name: 'image', maxCount: 5 },
+  { name: 'video', maxCount: 5 }
+]),
   updateService
 );
 

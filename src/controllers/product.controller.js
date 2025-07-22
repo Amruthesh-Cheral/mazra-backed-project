@@ -17,6 +17,7 @@ export const createProduct = catchAsync(async (req, res, next) => {
     category,
     stock,
     isFeatured,
+    usp
   } = req.body;
 
   if (!name || !description || !price || !service || !category || !stock) {
@@ -67,6 +68,7 @@ export const createProduct = catchAsync(async (req, res, next) => {
     stock,
     isFeatured,
     images: uploadedImages,
+    usp,
   });
 
   res.status(201).json({
@@ -147,6 +149,7 @@ export const updateProduct = catchAsync(async (req, res, next) => {
     category,
     stock,
     isFeatured,
+    usp,
   } = req.body;
 
   // Handle image replacement
@@ -189,6 +192,7 @@ export const updateProduct = catchAsync(async (req, res, next) => {
   product.category = category || product.category;
   product.stock = stock || product.stock;
   product.isFeatured = isFeatured !== undefined ? isFeatured : product.isFeatured;
+  product.usp = usp || product.usp;
   if (newImages.length > 0) product.images = newImages;
 
   // Update slug if name changes
@@ -224,5 +228,36 @@ export const deleteProduct = catchAsync(async (req, res, next) => {
   res.status(200).json({
     success: true,
     message: 'Product deleted successfully',
+  });
+});
+
+
+
+export const getProductsByCategory = catchAsync(async (req, res, next) => {
+  const { categoryId } = req.params;
+  let { page = 1, limit = 10, keyword = '', sort = '-createdAt' } = req.query;
+  
+  page = parseInt(page);
+  limit = parseInt(limit);
+
+  // Build the filter criteria including the provided category id and optional keyword
+  const filter = {
+    category: categoryId,
+    name: { $regex: keyword, $options: 'i' },
+  };
+
+  const total = await Product.countDocuments(filter);
+
+  const products = await Product.find(filter)
+    .sort(sort)
+    .skip((page - 1) * limit)
+    .limit(limit);
+
+  res.status(200).json({
+    success: true,
+    total,
+    page,
+    pages: Math.ceil(total / limit),
+    data: products,
   });
 });

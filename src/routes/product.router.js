@@ -7,6 +7,7 @@ import {
   deleteProduct,
   getAllProducts,
   getProductBySlug,
+  getProductsByCategory,
   updateProduct,
 } from "../controllers/product.controller.js";
 
@@ -36,6 +37,7 @@ productRouter.put(
 
 //Get apis
 productRouter.get("/", getAllProducts);
+productRouter.get("/category/:categoryId", getProductsByCategory);
 productRouter.get("/:slug", getProductBySlug);
 
 //Delete apis

@@ -41,6 +41,10 @@ category: {
   ref: 'Category',
   // required: true,
 },
+usp: {
+  type: [String],
+  default: [],
+},
   stock: {
     type: Number,
     required: true,

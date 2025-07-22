@@ -5,14 +5,14 @@ const serviceSchema = new mongoose.Schema({
   description: { type: String, required: true },
   heading: { type: String},
   subHeading: { type: String},
-  image:{
+  image:[{
   url: { type: String},
   public_id: { type: String }
-}, // URL or Cloudinary path
-  video: {
+}], // URL or Cloudinary path
+  video: [{
   url: { type: String},
   public_id: { type: String }
-},
+}],
 }, { timestamps: true });
 
 const Service = mongoose.model('Service', serviceSchema);

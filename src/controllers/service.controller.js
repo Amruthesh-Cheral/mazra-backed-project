@@ -15,23 +15,31 @@ export const addService = catchAsync(async (req, res, next) => {
   const exists = await Service.findOne({ name });
   if (exists) return next(new ApiError(400, 'Service already exists'));
 
-  let image = {}, video = {};
 
-  if (req.files?.image) {
-    image = await uploadToCloudinary(req.files.image[0], 'services', 'image');
+  let imageUploads=[];
+  let videoUploads=[];
+  
+  if (req.files?.image ) {
+    
+    imageUploads = await Promise.all(
+      req.files.image.map(file => uploadToCloudinary(file, 'services', 'image'))
+    );
+  }
+  
+  if (req.files?.video ) {
+    videoUploads = await Promise.all(
+      req.files.video.map(file => uploadToCloudinary(file, 'services', 'video'))
+    );
   }
 
-  if (req.files?.video) {
-    video = await uploadToCloudinary(req.files.video[0], 'services', 'video');
-  }
 
   const service = await Service.create({
     name,
     description,
     heading,
     subHeading,
-    image,
-    video,
+    image: imageUploads,
+video: videoUploads,
   });
 
   res.status(201).json({
@@ -169,20 +177,25 @@ export const updateService = catchAsync(async (req, res, next) => {
   if (subHeading) service.subHeading = subHeading;
 
   if (req.files?.image) {
-    // Delete old image
-    if (service.image?.public_id) {
-      await cloudinary.uploader.destroy(service.image.public_id);
-    }
-    service.image = await uploadToCloudinary(req.files.image[0], 'services', 'image');
+
+  for (const img of service.image || []) {
+    await cloudinary.uploader.destroy(img.public_id);
   }
 
+  service.image = await Promise.all(
+    req.files.image.map(file => uploadToCloudinary(file, 'services', 'image'))
+  );
+}
   if (req.files?.video) {
-    if (service.video?.public_id) {
-      await cloudinary.uploader.destroy(service.video.public_id);
-    }
-    service.video = await uploadToCloudinary(req.files.video[0], 'services', 'video');
+
+  for (const video of service.video || []) {
+    await cloudinary.uploader.destroy(video.public_id);
   }
 
+  service.video = await Promise.all(
+    req.files.video.map(file => uploadToCloudinary(file, 'services', 'video'))
+  );
+}
   await service.save();
 
   res.status(200).json({
@@ -241,12 +254,20 @@ export const deleteService = catchAsync(async (req, res, next) => {
   if (!service) return next(new ApiError(404, 'Service not found'));
 
   // Delete Cloudinary media
-  if (service.image?.public_id) {
-    await cloudinary.uploader.destroy(service.image.public_id);
+  if (Array.isArray(service.image)) {
+  for (const img of service.image) {
+    if (img?.public_id) {
+      await cloudinary.uploader.destroy(img.public_id);
+    }
   }
-  if (service.video?.public_id) {
-    await cloudinary.uploader.destroy(service.video.public_id);
+}
+  if (Array.isArray(service.video)) {
+  for (const video of service.video) {
+    if (video?.public_id) {
+      await cloudinary.uploader.destroy(video.public_id);
+    }
   }
+}
 
   // Optional: delete categories under this service
   await Category.deleteMany({ service: id });
