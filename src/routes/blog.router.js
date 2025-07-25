@@ -8,7 +8,7 @@ const blogRouter=express.Router();
 
 
 blogRouter.post('/',verifyToken,authorizeRoles("Admin"),upload.single('image'),createBlog);
-blogRouter.get('/',verifyToken,getBlogs);
+blogRouter.get('/',getBlogs);
 blogRouter.put('/:id',verifyToken,authorizeRoles("Admin"),upload.single('image'),updateBlog);
 blogRouter.delete('/:id',verifyToken,authorizeRoles("Admin"),deleteBlog);
 

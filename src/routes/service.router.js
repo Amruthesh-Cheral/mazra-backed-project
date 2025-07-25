@@ -35,17 +35,17 @@ serviceRouter.post(
 
 serviceRouter.get(
   '/services',
-  verifyToken,
+  // verifyToken,
   getAllServices
 );
 serviceRouter.get(
   '/categories/:serviceId',
-  verifyToken,
+  // verifyToken,
   getCategoriesByService
 );
 serviceRouter.get(
   '/categories',
-  verifyToken,
+  // verifyToken,
   getAllCategories
 );
 
@@ -90,15 +90,15 @@ serviceRouter.delete(
 
 serviceRouter.get(
   '/category/:id',
-  verifyToken,
-  authorizeRoles("Admin"),
+  // verifyToken,
+  // authorizeRoles("Admin"),
   getSingleCategory
 );
 
 serviceRouter.get(
   '/service/:id',
-  verifyToken,
-  authorizeRoles("Admin"),
+  // verifyToken,
+  // authorizeRoles("Admin"),
   getSingleService
 );
 

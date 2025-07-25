@@ -1,22 +1,22 @@
 import dotenv from 'dotenv';
 import nodemailer from 'nodemailer';
-dotenv.config();
+import ApiError from '../utils/ApiError.js';
 
+dotenv.config();
 
 // Configure email transporter
 const transporter = nodemailer.createTransport({
-    host: process.env.EMAIL_HOST,
-    port: 465,
+  host: process.env.EMAIL_HOST,
+  port: 465,
   secure: true,
-    auth: {
-        user: process.env.EMAIL_USERNAME,
-        pass: process.env.EMAIL_PASSWORD,
-    },
-    tls: {
-    rejectUnauthorized: false, // Disable certificate validation
+  auth: {
+    user: process.env.EMAIL_USERNAME,
+    pass: process.env.EMAIL_PASSWORD,
+  },
+  tls: {
+    rejectUnauthorized: false,
   },
 });
-
 
 // Send verification email with OTP
 export const sendEmail = async (email, subject, emailTemplate) => {
@@ -27,7 +27,13 @@ export const sendEmail = async (email, subject, emailTemplate) => {
     html: emailTemplate,
   };
 
-  await transporter.sendMail(mailOptions);
+  try {
+    await transporter.sendMail(mailOptions);
+  } catch (error) {
+    console.error('Email sending error:', error.message); // Log for debug
+    // Throw proper error for global error handler
+    throw new ApiError(500, 'Failed to send verification email. Please try again.');
+  }
 };
 
 

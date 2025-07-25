@@ -9,45 +9,53 @@ import { createOTPRecord, verifyOTP } from "./otp.controller.js";
 export const signup = catchAsync(async (req, res, next) => {
   const { username, email, password } = req.body;
 
-  // Basic validation
   if (!username || !email || !password) {
     return next(new ApiError(400, "Name, email, and password are required"));
   }
 
-  // Check if user exists
   const userExists = await User.findOne({ email });
   if (userExists) {
     return next(new ApiError(409, "Email already in use"));
   }
 
-  // Create user (password automatically hashed via `pre('save')` hook)
-  const user = await User.create({
-    username,
-    email,
-    password
-  });
+  let user;
 
-  // Generate and send OTP
-  const otp = await createOTPRecord(email);
-  const emailVerificationTemp= emailVerificationTemplate(user.username, otp)
-  await sendEmail(email,'Email Verification OTP', emailVerificationTemp);
+  try {
+    user = await User.create({
+      username,
+      email,
+      password
+    });
 
-  const userResponse = {
-    _id: user._id,
-    username: user.username,
-    email: user.email,
-    avatar: user.avatar,
-    role: user.role,
-    createdAt: user.createdAt,
-    verifyStatus: user.verifyStatus
-  };
+    const otp = await createOTPRecord(email);
+    const emailVerificationTemp = emailVerificationTemplate(user.username, otp);
+    await sendEmail(email, 'Email Verification OTP', emailVerificationTemp);
 
-  res.status(201).json({
-    success: true,
-    data: userResponse,
-    message: "User registered successfully. Please check your email for verification OTP.",
-  });
+    const userResponse = {
+      _id: user._id,
+      username: user.username,
+      email: user.email,
+      avatar: user.avatar,
+      role: user.role,
+      createdAt: user.createdAt,
+      verifyStatus: user.verifyStatus
+    };
+
+    return res.status(201).json({
+      success: true,
+      data: userResponse,
+      message: "User registered successfully. Please check your email for verification OTP.",
+    });
+
+  } catch (error) {
+    if (user) {
+      // Delete user if OTP or email send failed
+      await User.findByIdAndDelete(user._id);
+    }
+    return next(new ApiError(500, "User registration failed. Please try again."));
+  }
 });
+
 
 export const signin = catchAsync(async (req, res, next) => {
   const { email, password } = req.body;
