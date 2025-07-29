@@ -5,7 +5,8 @@ import ApiError from '../utils/ApiError.js';
 import sharp from 'sharp';
 import fs from 'fs/promises';
 import slugify from 'slugify';
-import { serviceCategoryMap } from '../seeder/categoryData.js';
+import Cart from '../models/cart.model.js';
+import Wishlist from '../models/wishlist.model.js';
 
 export const createProduct = catchAsync(async (req, res, next) => {
   const {
@@ -217,19 +218,32 @@ export const deleteProduct = catchAsync(async (req, res, next) => {
   const product = await Product.findById(id);
   if (!product) return next(new ApiError(404, 'Product not found'));
 
-  // Delete images from Cloudinary
+  // 1. Delete images from Cloudinary
   for (const img of product.images) {
     await cloudinary.uploader.destroy(img.public_id);
   }
 
-  // Delete the product from DB
+  // 2. Delete the product from DB
   await Product.findByIdAndDelete(id);
+
+  // 3. Remove the product from all carts
+  await Cart.updateMany(
+    { 'items.product': id },
+    { $pull: { items: { product: id } } }
+  );
+
+  // 4. Remove the product from all wishlists
+  await Wishlist.updateMany(
+    { products: id },
+    { $pull: { products: id } }
+  );
 
   res.status(200).json({
     success: true,
-    message: 'Product deleted successfully',
+    message: 'Product deleted successfully and removed from all carts/wishlists',
   });
 });
+
 
 
 
