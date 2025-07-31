@@ -21,6 +21,14 @@ export const getBlogs = catchAsync(async (req, res) => {
   res.status(200).json({ success: true, data: blogs });
 });
 
+
+export const getSingleBlog = catchAsync(async (req, res) => {
+  const {id}=req.params;
+
+  const blog = await Blog.findById(id);
+  res.status(200).json({ success: true, data: blog });
+});
+
 export const updateBlog = catchAsync(async (req, res) => {
   const { id } = req.params;
   const blog = await Blog.findById(id);
